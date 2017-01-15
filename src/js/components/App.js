@@ -7,9 +7,7 @@ import AppStore from '../stores/AppStore';
 
 function getAppState(){
   return{
-    //Example
-
-    // movies: AppStore.getMovieResults()
+    movies: AppStore.getMovieResults()
   }
 }
 
@@ -19,9 +17,7 @@ class App extends React.Component{
   constructor(props){
     super(props);
     this.state = {
-      //Example
-
-      // movies: ''
+      movies: ''
     };
 
   }
@@ -37,31 +33,19 @@ class App extends React.Component{
   }
 
   render(){
-    //Examples
-
-    // if (this.state.movies == ''){
-    //   var movieResults = '';
-    // } else {
-    //   var movieResults =
-    //   <MovieResults movies={this.state.movies} />
-    // }
-    // console.log('Are The Movies in the current state? (App.js:34) \n' +this.state.movies);
-
+      var movieResults =
+      <div>{this.state.movies}</div>
     return(
       <div>
-        {//EXAMPLES
-          /*
-          <SearchForm />
         {movieResults}
-
-        */}
+        <button onClick={AppActions.addMovies.bind(this)}>Add</button>
+        <button onClick={AppActions.clearMovies.bind(this)}>Clear</button>        
       </div>
     )
   }
 
 
   _onChange(){
-    // console.log('Movies are Now in (App.js:43) \n' +AppStore.getMovieResults());
     this.setState(getAppState());
 
   }

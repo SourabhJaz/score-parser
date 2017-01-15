@@ -17,6 +17,17 @@ var AppActions = {
   //     movies: movies
   //   })
   // }
+  // 
+  addMovies(){
+    AppDispatcher.handleViewAction({
+      actionType: AppConstants.ADD
+    })
+  },
+  clearMovies(){
+    AppDispatcher.handleViewAction({
+      actionType: AppConstants.CLEAR
+    })
+  }
 }
 
 

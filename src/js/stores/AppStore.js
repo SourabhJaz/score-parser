@@ -6,7 +6,7 @@ const CHANGE_EVENT = 'change';
 
 //Example
 
-// let _movies = [];
+let _movies = '';
 // let _selected = '';
 
 
@@ -14,19 +14,20 @@ const CHANGE_EVENT = 'change';
 class AppStoreClass extends EventEmitter {
     //Example
 
-    // setMovieResults(movies){
-    //     _movies = movies;
-    // console.log('Results SET (AppStore.js:17): \n' + _movies);
-    // }
+    resetMovieResults(){
+        _movies = '';
+    }
 
 
     //Example
 
-    // getMovieResults(){
-    //     return _movies;
-    // console.log('Results GET (AppStore.js:24): \n' + _movies);
-    //
-    // }
+    addMovieResults(str){
+        _movies=_movies+' '+str;
+    }
+
+    getMovieResults(){
+                return _movies;
+    }
 
     emitChange() {
         this.emit(CHANGE_EVENT);
@@ -48,19 +49,14 @@ AppDispatcher.register((payload) => {
     const action = payload.action;
 
     switch (action.actionType) {
-      //Examples
 
-        case
-        // AppConstants.SEARCH_MOVIES:
-        // console.log('Searching..(AppStore.js:42): \n' + action.movie.title);
-        // AppAPI.searchMovies(action.movie);
+        case AppConstants.ADD:
+        AppStore.addMovieResults("This");
         AppStore.emit(CHANGE_EVENT);
         break;
         //
-        case
-        // AppConstants.RECEIVE_MOVIE_RESULTS:
-        // console.log('Received Results (AppStore.js:48): \n' + action.movies);
-        // AppStore.setMovieResults(action.movies);
+        case AppConstants.CLEAR:
+        AppStore.resetMovieResults();
         AppStore.emit(CHANGE_EVENT);
         break;
 
