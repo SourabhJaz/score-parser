@@ -10,15 +10,23 @@ def getExportString(text):
 
 def iterate_matches(parsed_page):
 	all_matches = []
-	for match in parsed_page.find_all('section',{'class':'matches-day-block'}):
-		match_report = {}
-		if match_report != None:
-			match_report = getMatchDetails(match)
-		all_matches.append(match_report)
+	for matches_category in parsed_page.find_all('div', {'class':'match-section-head'}):
+		matches = matches_category.find_next_sibling('section', {'class':'matches-day-block'})
+		if matches != None:
+			for match in matches.find_all('section', {'class':'default-match-block'}):
+				match_report = {}
+				match_report = getMatchDetails(match, matches_category)
+				all_matches.append(match_report)
 	return all_matches
 
-def getMatchDetails(match):
-		match_report={'team_1':'', 'team_2':'', 'score_1':'', 'score_2':'', 'status':''}
+def getMatchDetails(match, matches_category):
+		match_report={'category':'', 'location':'', 'team_1':'', 'team_2':'', 'score_1':'', 'score_2':'', 'status':''}
+
+		if matches_category != None:
+			match_report["category"] = getExportString(matches_category.text)
+		location = match.find('span',{'class':'match-no'})
+		if location != None:
+			match_report["location"] = getExportString(location.text)
 		team1 = match.find('div',{'class':'innings-info-1'})
 		team1_score = team1.find('span',{'class':'bold'})
 		if team1_score != None:
