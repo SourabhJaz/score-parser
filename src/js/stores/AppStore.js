@@ -1,68 +1,54 @@
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import AppConstants from '../constants/AppConstants';
 import { EventEmitter } from 'events';
+import { ajaxUtility } from '../utils/ajaxPromise';
 import AppAPI from '../utils/appAPI';
 const CHANGE_EVENT = 'change';
+var matches = null;
 
-//Example
+function setScores(response){
+    console.log(response);
+    matches = response;
+    AppStore.emitChange();
+}
 
-let _movies = '';
-// let _selected = '';
-
-
+function hitScoreAPI(){
+    var promiseObject = ajaxUtility('./../scrap.py');
+    promiseObject.then(response => setScores(response));
+}
 
 class AppStoreClass extends EventEmitter {
-    //Example
-
-    resetMovieResults(){
-        _movies = '';
+    getInitialData(){
+        hitScoreAPI();
     }
-
-
-    //Example
-
-    addMovieResults(str){
-        _movies=_movies+' '+str;
+    pollMatches(){
+        setInterval(hitScoreAPI,10000);
     }
-
-    getMovieResults(){
-                return _movies;
+    getMatches(){
+        return matches;
     }
-
     emitChange() {
         this.emit(CHANGE_EVENT);
     }
-
     addChangeListener(callback) {
-
-        this.on('change', callback);
-
+        this.on(CHANGE_EVENT, callback);
     }
-
     removeChangeListener(callback) {
-        this.removeListener('change', callback);
+        this.removeListener(CHANGE_EVENT, callback);
     }
-
 }
 
 AppDispatcher.register((payload) => {
     const action = payload.action;
-
     switch (action.actionType) {
-
-        case AppConstants.ADD:
-        AppStore.addMovieResults("This");
-        AppStore.emit(CHANGE_EVENT);
-        break;
-        //
-        case AppConstants.CLEAR:
-        AppStore.resetMovieResults();
-        AppStore.emit(CHANGE_EVENT);
-        break;
-
+        case AppConstants.POLL_MATCHES:
+        AppStore.pollMatches();
+        break;        
+        case AppConstants.GET_MATCHES:
+        AppStore.getInitialData();
+        break;        
     }
     return true
-
 });
 
 // Initialize the singleton to register with the

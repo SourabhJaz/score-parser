@@ -1,10 +1,6 @@
 const AppConstants = {
-  //example constants
-
-  // SEARCH_MOVIES: 'SEARCH_MOVIES',
-  // RECEIVE_MOVIES_RESULT: 'RECEIVE_MOVIE_RESULTS'
-  ADD: 'add',
-  CLEAR: 'clear'
+  GET_MATCHES:'get_matches',
+  POLL_MATCHES:'poll_matches'  
 };
 
 export default AppConstants;

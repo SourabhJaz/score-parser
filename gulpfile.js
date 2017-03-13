@@ -11,7 +11,7 @@ gulp.task('connect', function() {
   connect.server({
     root: 'dist',
     livereload: true,
-    port: 3000
+    port: 3070
   });
 });
 
@@ -44,6 +44,9 @@ gulp.task('copy', function() {
   .pipe(gulp.dest('dist/css/'));
   gulp.src('src/js/vendors/*.*')
   .pipe(gulp.dest('dist/js'));
+  gulp.src('src/scrap.py')
+  .pipe(gulp.dest('dist'));
+
 });
 
 gulp.task('app', function(){

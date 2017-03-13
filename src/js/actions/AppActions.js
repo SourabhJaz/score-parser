@@ -2,31 +2,15 @@ import AppDispatcher from '../dispatcher/AppDispatcher';
 import AppConstants from '../constants/AppConstants';
 
 var AppActions = {
-  //Examples
-
-  // searchMovies(movie){
-  //   AppDispatcher.handleViewAction({
-  //     actionType: AppConstants.SEARCH_MOVIES,
-  //     movie: movie
-  //
-  //   })
-  // },
-  // receiveMovieResults(movies){
-  //   AppDispatcher.handleViewAction({
-  //     actionType: AppConstants.RECEIVE_MOVIE_RESULTS,
-  //     movies: movies
-  //   })
-  // }
-  // 
-  addMovies(){
+  matchCall(){
     AppDispatcher.handleViewAction({
-      actionType: AppConstants.ADD
+      actionType: AppConstants.POLL_MATCHES
     })
   },
-  clearMovies(){
+  initialData(){
     AppDispatcher.handleViewAction({
-      actionType: AppConstants.CLEAR
-    })
+      actionType: AppConstants.GET_MATCHES
+    })    
   }
 }
 

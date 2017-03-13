@@ -19977,31 +19977,14 @@ var _AppConstants2 = _interopRequireDefault(_AppConstants);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var AppActions = {
-  //Examples
-
-  // searchMovies(movie){
-  //   AppDispatcher.handleViewAction({
-  //     actionType: AppConstants.SEARCH_MOVIES,
-  //     movie: movie
-  //
-  //   })
-  // },
-  // receiveMovieResults(movies){
-  //   AppDispatcher.handleViewAction({
-  //     actionType: AppConstants.RECEIVE_MOVIE_RESULTS,
-  //     movies: movies
-  //   })
-  // }
-  //
-
-  addMovies: function addMovies() {
+  matchCall: function matchCall() {
     _AppDispatcher2.default.handleViewAction({
-      actionType: _AppConstants2.default.ADD
+      actionType: _AppConstants2.default.POLL_MATCHES
     });
   },
-  clearMovies: function clearMovies() {
+  initialData: function initialData() {
     _AppDispatcher2.default.handleViewAction({
-      actionType: _AppConstants2.default.CLEAR
+      actionType: _AppConstants2.default.GET_MATCHES
     });
   }
 };
@@ -20009,7 +19992,7 @@ var AppActions = {
 exports.default = AppActions;
 
 
-},{"../constants/AppConstants":172,"../dispatcher/AppDispatcher":173}],171:[function(require,module,exports){
+},{"../constants/AppConstants":173,"../dispatcher/AppDispatcher":174}],171:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -20030,6 +20013,10 @@ var _AppStore = require('../stores/AppStore');
 
 var _AppStore2 = _interopRequireDefault(_AppStore);
 
+var _scorecard = require('./scorecard');
+
+var _scorecard2 = _interopRequireDefault(_scorecard);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -20038,12 +20025,9 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-// import SearchForm from './SearchForm';
-// import MovieResults from './MovieResults';
-
 function getAppState() {
   return {
-    movies: _AppStore2.default.getMovieResults()
+    data: _AppStore2.default.getMatches()
   };
 }
 
@@ -20055,17 +20039,21 @@ var App = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(App).call(this, props));
 
-    _this.state = {
-      movies: ''
-    };
-
+    _this.state = getAppState();
     return _this;
   }
 
   _createClass(App, [{
+    key: 'componentWillMount',
+    value: function componentWillMount() {
+      _AppStore2.default.addChangeListener(this._onChange.bind(this));
+    }
+  }, {
     key: 'componentDidMount',
     value: function componentDidMount() {
       _AppStore2.default.addChangeListener(this._onChange.bind(this));
+      _AppActions2.default.initialData();
+      _AppActions2.default.matchCall();
     }
   }, {
     key: 'componentWillUnMount',
@@ -20073,33 +20061,49 @@ var App = function (_React$Component) {
       _AppStore2.default.removeChangeListener(this._onChange.bind(this));
     }
   }, {
+    key: '_onChange',
+    value: function _onChange() {
+      this.setState(getAppState());
+    }
+  }, {
+    key: '_parseMatches',
+    value: function _parseMatches() {
+      var currentMatches = this.state.data || {};
+      console.log(currentMatches);
+      var matchList = currentMatches.matches || [];
+      var scoreCards = [];
+      var notStarted;
+      scoreCards = matchList.map(function (match, index) {
+        notStarted = false;
+        if (!match.score_1) {
+          notStarted = true;
+        }
+        return _react2.default.createElement(
+          'div',
+          { className: 'col-xl-4 col-lg-4 col-md-6 col-sm-12', key: index },
+          _react2.default.createElement(
+            'div',
+            { className: 'scorecard ' + (notStarted ? 'not-started' : '') },
+            _react2.default.createElement(_scorecard2.default, { team_1: match.team_1, team_2: match.team_2, score_1: match.score_1, score_2: match.score_2, status: match.status })
+          )
+        );
+      });
+      return scoreCards;
+    }
+  }, {
     key: 'render',
     value: function render() {
-      var movieResults = _react2.default.createElement(
-        'div',
+      var matchCards = this._parseMatches();
+      var noData = _react2.default.createElement(
+        'h2',
         null,
-        this.state.movies
+        'Fetching live scores ...'
       );
       return _react2.default.createElement(
         'div',
         null,
-        movieResults,
-        _react2.default.createElement(
-          'button',
-          { onClick: _AppActions2.default.addMovies.bind(this) },
-          'Add'
-        ),
-        _react2.default.createElement(
-          'button',
-          { onClick: _AppActions2.default.clearMovies.bind(this) },
-          'Clear'
-        )
+        this.state.data ? matchCards : noData
       );
-    }
-  }, {
-    key: '_onChange',
-    value: function _onChange() {
-      this.setState(getAppState());
     }
   }]);
 
@@ -20109,25 +20113,104 @@ var App = function (_React$Component) {
 exports.default = App;
 
 
-},{"../actions/AppActions":170,"../stores/AppStore":175,"react":169}],172:[function(require,module,exports){
+},{"../actions/AppActions":170,"../stores/AppStore":176,"./scorecard":172,"react":169}],172:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var ScoreCard = function (_React$Component) {
+  _inherits(ScoreCard, _React$Component);
+
+  function ScoreCard(props) {
+    _classCallCheck(this, ScoreCard);
+
+    return _possibleConstructorReturn(this, Object.getPrototypeOf(ScoreCard).call(this, props));
+  }
+
+  _createClass(ScoreCard, [{
+    key: 'render',
+    value: function render() {
+      return _react2.default.createElement(
+        'div',
+        { className: 'scores-wrap' },
+        _react2.default.createElement(
+          'div',
+          { className: 'row scores' },
+          _react2.default.createElement(
+            'div',
+            { className: 'col-lg-6 col-md-6 col-sm-6 col-xs-6' },
+            _react2.default.createElement(
+              'div',
+              { className: 'team-name' },
+              this.props.team_1
+            ),
+            _react2.default.createElement(
+              'div',
+              { className: 'team-score' },
+              this.props.score_1
+            )
+          ),
+          _react2.default.createElement(
+            'div',
+            { className: 'col-lg-6 col-md-6 col-sm-6 col-xs-6' },
+            _react2.default.createElement(
+              'div',
+              { className: 'team-name' },
+              this.props.team_2
+            ),
+            _react2.default.createElement(
+              'div',
+              { className: 'team-score' },
+              this.props.score_2
+            )
+          )
+        ),
+        _react2.default.createElement(
+          'div',
+          { className: 'col-lg-12 text-center status' },
+          this.props.status
+        )
+      );
+    }
+  }]);
+
+  return ScoreCard;
+}(_react2.default.Component);
+
+exports.default = ScoreCard;
+
+
+},{"react":169}],173:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 var AppConstants = {
-  //example constants
-
-  // SEARCH_MOVIES: 'SEARCH_MOVIES',
-  // RECEIVE_MOVIES_RESULT: 'RECEIVE_MOVIE_RESULTS'
-  ADD: 'add',
-  CLEAR: 'clear'
+  GET_MATCHES: 'get_matches',
+  POLL_MATCHES: 'poll_matches'
 };
 
 exports.default = AppConstants;
 
 
-},{}],173:[function(require,module,exports){
+},{}],174:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -20174,7 +20257,7 @@ var AppDispatcher = new DispatcherClass();
 exports.default = AppDispatcher;
 
 
-},{"flux":3}],174:[function(require,module,exports){
+},{"flux":3}],175:[function(require,module,exports){
 'use strict';
 
 var _App = require('./components/App');
@@ -20198,7 +20281,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 _reactDom2.default.render(_react2.default.createElement(_App2.default, null), document.getElementById('app'));
 
 
-},{"./components/App":171,"./utils/appAPI":176,"react":169,"react-dom":7}],175:[function(require,module,exports){
+},{"./components/App":171,"./utils/appAPI":178,"react":169,"react-dom":7}],176:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -20217,6 +20300,8 @@ var _AppConstants2 = _interopRequireDefault(_AppConstants);
 
 var _events = require('events');
 
+var _ajaxPromise = require('../utils/ajaxPromise');
+
 var _appAPI = require('../utils/appAPI');
 
 var _appAPI2 = _interopRequireDefault(_appAPI);
@@ -20230,11 +20315,20 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var CHANGE_EVENT = 'change';
+var matches = null;
 
-//Example
+function setScores(response) {
+    console.log(response);
+    matches = response;
+    AppStore.emitChange();
+}
 
-var _movies = '';
-// let _selected = '';
+function hitScoreAPI() {
+    var promiseObject = (0, _ajaxPromise.ajaxUtility)('./../scrap.py');
+    promiseObject.then(function (response) {
+        return setScores(response);
+    });
+}
 
 var AppStoreClass = function (_EventEmitter) {
     _inherits(AppStoreClass, _EventEmitter);
@@ -20246,25 +20340,19 @@ var AppStoreClass = function (_EventEmitter) {
     }
 
     _createClass(AppStoreClass, [{
-        key: 'resetMovieResults',
-
-        //Example
-
-        value: function resetMovieResults() {
-            _movies = '';
-        }
-
-        //Example
-
-    }, {
-        key: 'addMovieResults',
-        value: function addMovieResults(str) {
-            _movies = _movies + ' ' + str;
+        key: 'getInitialData',
+        value: function getInitialData() {
+            hitScoreAPI();
         }
     }, {
-        key: 'getMovieResults',
-        value: function getMovieResults() {
-            return _movies;
+        key: 'pollMatches',
+        value: function pollMatches() {
+            setInterval(hitScoreAPI, 10000);
+        }
+    }, {
+        key: 'getMatches',
+        value: function getMatches() {
+            return matches;
         }
     }, {
         key: 'emitChange',
@@ -20274,13 +20362,12 @@ var AppStoreClass = function (_EventEmitter) {
     }, {
         key: 'addChangeListener',
         value: function addChangeListener(callback) {
-
-            this.on('change', callback);
+            this.on(CHANGE_EVENT, callback);
         }
     }, {
         key: 'removeChangeListener',
         value: function removeChangeListener(callback) {
-            this.removeListener('change', callback);
+            this.removeListener(CHANGE_EVENT, callback);
         }
     }]);
 
@@ -20289,19 +20376,13 @@ var AppStoreClass = function (_EventEmitter) {
 
 _AppDispatcher2.default.register(function (payload) {
     var action = payload.action;
-
     switch (action.actionType) {
-
-        case _AppConstants2.default.ADD:
-            AppStore.addMovieResults("This");
-            AppStore.emit(CHANGE_EVENT);
+        case _AppConstants2.default.POLL_MATCHES:
+            AppStore.pollMatches();
             break;
-        //
-        case _AppConstants2.default.CLEAR:
-            AppStore.resetMovieResults();
-            AppStore.emit(CHANGE_EVENT);
+        case _AppConstants2.default.GET_MATCHES:
+            AppStore.getInitialData();
             break;
-
     }
     return true;
 });
@@ -20313,7 +20394,35 @@ var AppStore = new AppStoreClass();
 exports.default = AppStore;
 
 
-},{"../constants/AppConstants":172,"../dispatcher/AppDispatcher":173,"../utils/appAPI":176,"events":1}],176:[function(require,module,exports){
+},{"../constants/AppConstants":173,"../dispatcher/AppDispatcher":174,"../utils/ajaxPromise":177,"../utils/appAPI":178,"events":1}],177:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.ajaxUtility = ajaxUtility;
+function ajaxUtility(params) {
+  var promiseObject = new Promise(function (resolve) {
+    var request = new XMLHttpRequest();
+    request.open('GET', params);
+    request.onload = function () {
+      if (request.status == 200) {
+        var response = JSON.parse(request.response);
+        resolve(response);
+      }
+    };
+    request.onerror = function () {
+      console.log('Error fetching data.');
+    };
+    request.setRequestHeader("Accept", "application/json");
+    request.setRequestHeader("Content-Type", "application/json");
+    request.send();
+  });
+  return promiseObject;
+}
+
+
+},{}],178:[function(require,module,exports){
 'use strict';
 
 var _AppActions = require('../actions/AppActions');
@@ -20352,4 +20461,4 @@ module.exports = {
 };
 
 
-},{"../actions/AppActions":170}]},{},[174]);
+},{"../actions/AppActions":170}]},{},[175]);

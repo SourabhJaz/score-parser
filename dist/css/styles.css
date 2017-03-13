@@ -1,0 +1,47 @@
+body{
+       background: #1F262A;
+       color: #FFFFFF;
+       padding: 1%;
+}
+.scores-wrap{
+        width: 99%;
+        margin-left: 1%;
+}
+.scorecard{
+        background: #303644;
+        border-radius: 5px;
+        border: 5px solid #FF8800;
+        padding: 3%;
+        overflow-y: scroll;
+        overflow-x: hidden;
+        word-wrap: break-word;
+        margin-top: 5%;
+        height: 16vw;
+}
+.not-started{
+        border: 5px solid #687180;    
+}
+.scores{
+        color: #FFFFFF;
+        text-transform: uppercase;
+        height: 8vw;
+}
+.team-name{
+        font-size: 1.5vw;
+}
+.team-score{
+        font-size: 1.5vw;
+        color: #C0C0C0;
+        line-height: 25px;
+}
+.status{
+        color: #FFFFFF;
+        border-radius: 5px;
+        background: #2A9FD6;
+        padding: 2%;
+        margin-top: 3%;
+        font-size: 1.2vw;
+}
+h3{
+        color: #8C92AC;
+}
