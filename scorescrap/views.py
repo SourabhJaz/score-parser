@@ -49,7 +49,7 @@ def getMatchDetails(match, matches_category):
 def index(request):
 	return HttpResponse("Welcome!")
 
-@cache_page(20)
+@cache_page(10)
 def get_scores(request):
 	response = urlopen("http://www.espncricinfo.com/ci/engine/match/index.html?view=live")
 	parsed_page = BeautifulSoup(response,"html.parser")
