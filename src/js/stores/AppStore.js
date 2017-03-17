@@ -13,7 +13,7 @@ function setScores(response){
 }
 
 function hitScoreAPI(){
-    var promiseObject = ajaxUtility('./../scrap.py');
+    var promiseObject = ajaxUtility('http://127.0.0.1:8000/scorescrap/get_scores');
     promiseObject.then(response => setScores(response));
 }
 
