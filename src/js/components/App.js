@@ -31,21 +31,30 @@ class App extends React.Component{
   }
   _parseMatches(){
     var currentMatches = this.state.data || {};
-    console.log(currentMatches);
     var matchList = currentMatches.matches || [];
     var scoreCards = [];
-    var notStarted;
+    var notStarted, printCategory;
+    var currentCategory = '';
     scoreCards = matchList.map(function(match,index){
       notStarted = false;
+      printCategory = false;
       if(!match.score_1){
         notStarted = true;
       }
+      if(match.category !== currentCategory)
+      {
+        currentCategory = match.category;
+        printCategory = true;
+      }
       return (
+        <div>
+          {printCategory && (<div className='col-lg-12 col-md-12 col-sm-12 text-center category'>{currentCategory}</div>)}
           <div className = 'col-xl-4 col-lg-4 col-md-6 col-sm-6 col-xm-12' key = {index}>
             <div className = {'scorecard '+(notStarted?'not-started':'')}>
               <ScoreCard data={match} />
             </div>
           </div>
+        </div>
       )
     });
     return scoreCards;

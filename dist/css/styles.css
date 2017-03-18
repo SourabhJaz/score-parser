@@ -3,6 +3,12 @@ body{
        color: #FFFFFF;
        padding: 1%;
 }
+.category{
+    font-size: 2vw;
+    padding: 5px;
+    background: #2D3C4D;
+    border-radius: 5px;
+}
 .scores-wrap{
         width: 99%;
         margin-left: 1%;
@@ -16,7 +22,8 @@ body{
         overflow-x: hidden;
         word-wrap: break-word;
         margin-top: 5%;
-        height: 16vw;
+        margin-bottom: 5%;
+        height: 18vw;
 }
 .not-started{
         border: 5px solid #687180;    
@@ -41,6 +48,10 @@ body{
         padding: 2%;
         margin-top: 3%;
         font-size: 1.2vw;
+}
+.location{
+    font-size: 0.9vw;
+    margin: 1%;
 }
 h3{
         color: #8C92AC;

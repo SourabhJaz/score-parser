@@ -22,7 +22,7 @@ class AppStoreClass extends EventEmitter {
         hitScoreAPI();
     }
     pollMatches(){
-        setInterval(hitScoreAPI,10000);
+        setInterval(hitScoreAPI,12000);
     }
     getMatches(){
         return matches;
