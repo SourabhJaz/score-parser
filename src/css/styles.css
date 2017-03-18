@@ -3,6 +3,11 @@ body{
        color: #FFFFFF;
        padding: 1%;
 }
+.dropdown{
+    margin-bottom:1%;
+    color: #000000;
+    float: right;
+}
 .category{
     font-size: 2vw;
     padding: 5px;

@@ -21129,7 +21129,7 @@ var AppActions = {
 exports.default = AppActions;
 
 
-},{"../constants/AppConstants":189,"../dispatcher/AppDispatcher":190}],187:[function(require,module,exports){
+},{"../constants/AppConstants":190,"../dispatcher/AppDispatcher":191}],187:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -21154,6 +21154,10 @@ var _scorecard = require('./scorecard');
 
 var _scorecard2 = _interopRequireDefault(_scorecard);
 
+var _Dropdown = require('./Dropdown');
+
+var _Dropdown2 = _interopRequireDefault(_Dropdown);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -21164,7 +21168,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function getAppState() {
   return {
-    data: _AppStore2.default.getMatches()
+    data: _AppStore2.default.getMatches(),
+    categories: [],
+    selected: 'All'
   };
 }
 
@@ -21198,9 +21204,35 @@ var App = function (_React$Component) {
       _AppStore2.default.removeChangeListener(this._onChange.bind(this));
     }
   }, {
+    key: '_getCategories',
+    value: function _getCategories() {
+      var currentMatches = this.state.data || {};
+      var matchList = currentMatches.matches || [];
+      var categories = [];
+      var uniqueCategories;
+      categories = matchList.map(function (match, index) {
+        return match.category;
+      });
+      uniqueCategories = new Set(categories);
+      return Array.from(uniqueCategories);
+    }
+  }, {
+    key: '_selectCategory',
+    value: function _selectCategory(event) {
+      this.setState({ selected: event.target.value });
+    }
+  }, {
     key: '_onChange',
     value: function _onChange() {
       this.setState(getAppState());
+    }
+  }, {
+    key: '_filterMatch',
+    value: function _filterMatch(match) {
+      if (this.state.selected === 'All' || match.category === this.state.selected) {
+        return true;
+      }
+      return false;
     }
   }, {
     key: '_parseMatches',
@@ -21210,7 +21242,7 @@ var App = function (_React$Component) {
       var scoreCards = [];
       var notStarted, printCategory;
       var currentCategory = '';
-      scoreCards = matchList.map(function (match, index) {
+      scoreCards = matchList.filter(this._filterMatch.bind(this)).map(function (match, index) {
         notStarted = false;
         printCategory = false;
         if (!match.score_1) {
@@ -21245,6 +21277,7 @@ var App = function (_React$Component) {
     key: 'render',
     value: function render() {
       var matchCards = this._parseMatches();
+      var categoryList = this._getCategories();
       var noData = _react2.default.createElement(
         'h2',
         null,
@@ -21253,6 +21286,7 @@ var App = function (_React$Component) {
       return _react2.default.createElement(
         'div',
         null,
+        _react2.default.createElement(_Dropdown2.default, { list: categoryList, selectItem: this._selectCategory.bind(this) }),
         this.state.data ? matchCards : noData
       );
     }
@@ -21264,7 +21298,79 @@ var App = function (_React$Component) {
 exports.default = App;
 
 
-},{"../actions/AppActions":186,"../stores/AppStore":192,"./scorecard":188,"react":185}],188:[function(require,module,exports){
+},{"../actions/AppActions":186,"../stores/AppStore":193,"./Dropdown":188,"./scorecard":189,"react":185}],188:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Dropdown = function (_React$Component) {
+	_inherits(Dropdown, _React$Component);
+
+	function Dropdown(props) {
+		_classCallCheck(this, Dropdown);
+
+		return _possibleConstructorReturn(this, (Dropdown.__proto__ || Object.getPrototypeOf(Dropdown)).call(this, props));
+	}
+
+	_createClass(Dropdown, [{
+		key: '_processList',
+		value: function _processList() {
+			var optionList = this.props.list;
+			var options = [];
+			options = optionList.map(function (option, index) {
+				return _react2.default.createElement(
+					'option',
+					{ key: index, value: option },
+					option
+				);
+			});
+			return options;
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var options = this._processList();
+			return _react2.default.createElement(
+				'div',
+				null,
+				_react2.default.createElement(
+					'select',
+					{ className: 'col-lg-2 text-center dropdown',
+						onChange: this.props.selectItem },
+					_react2.default.createElement(
+						'option',
+						{ value: 'All' },
+						'All Matches'
+					),
+					options
+				)
+			);
+		}
+	}]);
+
+	return Dropdown;
+}(_react2.default.Component);
+
+exports.default = Dropdown;
+
+
+},{"react":185}],189:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -21352,7 +21458,7 @@ var ScoreCard = function (_React$Component) {
 exports.default = ScoreCard;
 
 
-},{"react":185}],189:[function(require,module,exports){
+},{"react":185}],190:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -21366,7 +21472,7 @@ var AppConstants = {
 exports.default = AppConstants;
 
 
-},{}],190:[function(require,module,exports){
+},{}],191:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -21413,7 +21519,7 @@ var AppDispatcher = new DispatcherClass();
 exports.default = AppDispatcher;
 
 
-},{"flux":3}],191:[function(require,module,exports){
+},{"flux":3}],192:[function(require,module,exports){
 'use strict';
 
 var _App = require('./components/App');
@@ -21437,7 +21543,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 _reactDom2.default.render(_react2.default.createElement(_App2.default, null), document.getElementById('app'));
 
 
-},{"./components/App":187,"./utils/appAPI":194,"react":185,"react-dom":7}],192:[function(require,module,exports){
+},{"./components/App":187,"./utils/appAPI":195,"react":185,"react-dom":7}],193:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -21550,7 +21656,7 @@ var AppStore = new AppStoreClass();
 exports.default = AppStore;
 
 
-},{"../constants/AppConstants":189,"../dispatcher/AppDispatcher":190,"../utils/ajaxPromise":193,"../utils/appAPI":194,"events":2}],193:[function(require,module,exports){
+},{"../constants/AppConstants":190,"../dispatcher/AppDispatcher":191,"../utils/ajaxPromise":194,"../utils/appAPI":195,"events":2}],194:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -21578,7 +21684,7 @@ function ajaxUtility(params) {
 }
 
 
-},{}],194:[function(require,module,exports){
+},{}],195:[function(require,module,exports){
 'use strict';
 
 var _AppActions = require('../actions/AppActions');
@@ -21617,4 +21723,4 @@ module.exports = {
 };
 
 
-},{"../actions/AppActions":186}]},{},[191]);
+},{"../actions/AppActions":186}]},{},[192]);

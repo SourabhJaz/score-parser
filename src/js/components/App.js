@@ -2,11 +2,13 @@ import React from 'react';
 import AppActions from '../actions/AppActions';
 import AppStore from '../stores/AppStore';
 import ScoreCard from './scorecard';
-
+import Dropdown from './Dropdown';
 
 function getAppState(){
   return{
-    data : AppStore.getMatches()
+    data : AppStore.getMatches(),
+    categories : [],
+    selected: 'All'
   }
 }
 
@@ -26,8 +28,28 @@ class App extends React.Component{
   componentWillUnMount(){
     AppStore.removeChangeListener(this._onChange.bind(this));
   }
+  _getCategories(){
+    var currentMatches = this.state.data || {};
+    var matchList = currentMatches.matches || [];
+    var categories = [];
+    var uniqueCategories;
+    categories = matchList.map(function(match,index){
+      return match.category;
+    });
+    uniqueCategories = new Set(categories);
+    return Array.from(uniqueCategories);
+  }
+  _selectCategory(event){
+    this.setState({selected:event.target.value});
+  }
   _onChange(){
     this.setState(getAppState());
+  }
+  _filterMatch(match){
+      if(this.state.selected === 'All' || match.category === this.state.selected){
+        return true;
+      }
+      return false;
   }
   _parseMatches(){
     var currentMatches = this.state.data || {};
@@ -35,7 +57,7 @@ class App extends React.Component{
     var scoreCards = [];
     var notStarted, printCategory;
     var currentCategory = '';
-    scoreCards = matchList.map(function(match,index){
+    scoreCards = matchList.filter(this._filterMatch.bind(this)).map(function(match,index){
       notStarted = false;
       printCategory = false;
       if(!match.score_1){
@@ -61,9 +83,11 @@ class App extends React.Component{
   }
   render(){
     var matchCards = this._parseMatches();
+    var categoryList = this._getCategories();
     var noData = (<h2>Fetching live scores ...</h2>);
     return( 
       <div>
+      <Dropdown list={categoryList} selectItem={this._selectCategory.bind(this)} />
       {this.state.data ? matchCards : noData}
       </div>
     )
