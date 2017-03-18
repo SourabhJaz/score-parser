@@ -21150,6 +21150,10 @@ var _AppStore = require('../stores/AppStore');
 
 var _AppStore2 = _interopRequireDefault(_AppStore);
 
+var _AppConstants = require('../constants/AppConstants');
+
+var _AppConstants2 = _interopRequireDefault(_AppConstants);
+
 var _scorecard = require('./scorecard');
 
 var _scorecard2 = _interopRequireDefault(_scorecard);
@@ -21166,23 +21170,26 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-function getAppState() {
-  return {
-    data: _AppStore2.default.getMatches(),
-    categories: [],
-    selected: 'All'
-  };
-}
-
 var App = function (_React$Component) {
   _inherits(App, _React$Component);
+
+  _createClass(App, [{
+    key: 'getAppState',
+    value: function getAppState() {
+      return {
+        data: _AppStore2.default.getMatches(),
+        categories: this.state ? this.state.categories : [],
+        selected: this.state ? this.state.selected : _AppConstants2.default.ALL
+      };
+    }
+  }]);
 
   function App(props) {
     _classCallCheck(this, App);
 
     var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
 
-    _this.state = getAppState();
+    _this.state = _this.getAppState();
     return _this;
   }
 
@@ -21210,11 +21217,11 @@ var App = function (_React$Component) {
       var matchList = currentMatches.matches || [];
       var categories = [];
       var uniqueCategories;
-      categories = matchList.map(function (match, index) {
+      uniqueCategories = new Set(matchList.map(function (match, index) {
         return match.category;
-      });
-      uniqueCategories = new Set(categories);
-      return Array.from(uniqueCategories);
+      }));
+      categories = Array.from(uniqueCategories);
+      return categories;
     }
   }, {
     key: '_selectCategory',
@@ -21224,12 +21231,12 @@ var App = function (_React$Component) {
   }, {
     key: '_onChange',
     value: function _onChange() {
-      this.setState(getAppState());
+      this.setState(this.getAppState());
     }
   }, {
     key: '_filterMatch',
     value: function _filterMatch(match) {
-      if (this.state.selected === 'All' || match.category === this.state.selected) {
+      if (this.state.selected === _AppConstants2.default.ALL || match.category === this.state.selected) {
         return true;
       }
       return false;
@@ -21298,7 +21305,7 @@ var App = function (_React$Component) {
 exports.default = App;
 
 
-},{"../actions/AppActions":186,"../stores/AppStore":193,"./Dropdown":188,"./scorecard":189,"react":185}],188:[function(require,module,exports){
+},{"../actions/AppActions":186,"../constants/AppConstants":190,"../stores/AppStore":193,"./Dropdown":188,"./scorecard":189,"react":185}],188:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -21351,7 +21358,7 @@ var Dropdown = function (_React$Component) {
 				null,
 				_react2.default.createElement(
 					'select',
-					{ className: 'col-lg-2 text-center dropdown',
+					{ className: 'col-lg-3 col-md-6 col-sm-12 text-center dropdown',
 						onChange: this.props.selectItem },
 					_react2.default.createElement(
 						'option',
@@ -21444,7 +21451,7 @@ var ScoreCard = function (_React$Component) {
           this.props.data.status
         ),
         _react2.default.createElement(
-          'span',
+          'div',
           { className: 'col-lg-12 col-md-12 col-sm-12 text-center location' },
           this.props.data.location
         )
@@ -21466,7 +21473,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 var AppConstants = {
   GET_MATCHES: 'get_matches',
-  POLL_MATCHES: 'poll_matches'
+  POLL_MATCHES: 'poll_matches',
+  ALL: 'All'
 };
 
 exports.default = AppConstants;

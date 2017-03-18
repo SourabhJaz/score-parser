@@ -18,7 +18,7 @@ class Dropdown extends React.Component{
 		var options = this._processList();
 		return(
 			<div>
-				<select className='col-lg-2 text-center dropdown' 
+				<select className='col-lg-3 col-md-6 col-sm-12 text-center dropdown' 
 				onChange={this.props.selectItem}>
 					<option value='All'>All Matches</option>
 					{options}

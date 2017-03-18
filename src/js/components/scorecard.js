@@ -20,9 +20,9 @@ class ScoreCard extends React.Component{
           <div className = 'col-lg-12 col-md-12 col-sm-12 text-center status'>
             {this.props.data.status}
           </div>
-          <span className = 'col-lg-12 col-md-12 col-sm-12 text-center location'>
+          <div className = 'col-lg-12 col-md-12 col-sm-12 text-center location'>
             {this.props.data.location}
-          </span>
+          </div>
         </div>
       );
   }

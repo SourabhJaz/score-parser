@@ -1,21 +1,21 @@
 import React from 'react';
 import AppActions from '../actions/AppActions';
 import AppStore from '../stores/AppStore';
+import AppConstants from '../constants/AppConstants';
 import ScoreCard from './scorecard';
 import Dropdown from './Dropdown';
 
-function getAppState(){
-  return{
-    data : AppStore.getMatches(),
-    categories : [],
-    selected: 'All'
-  }
-}
-
 class App extends React.Component{
+  getAppState(){
+    return{
+      data : AppStore.getMatches(),
+      categories : this.state ? this.state.categories:[],
+      selected: this.state ? this.state.selected:AppConstants.ALL
+    }
+  }
   constructor(props){
     super(props);
-    this.state = getAppState();
+    this.state = this.getAppState();
   }
   componentWillMount(){
     AppStore.addChangeListener(this._onChange.bind(this));    
@@ -33,20 +33,21 @@ class App extends React.Component{
     var matchList = currentMatches.matches || [];
     var categories = [];
     var uniqueCategories;
-    categories = matchList.map(function(match,index){
+    uniqueCategories = new Set(matchList.map(function(match,index){
       return match.category;
-    });
-    uniqueCategories = new Set(categories);
-    return Array.from(uniqueCategories);
+      })
+    );
+    categories = Array.from(uniqueCategories); 
+    return categories;
   }
   _selectCategory(event){
     this.setState({selected:event.target.value});
   }
   _onChange(){
-    this.setState(getAppState());
+    this.setState(this.getAppState());
   }
   _filterMatch(match){
-      if(this.state.selected === 'All' || match.category === this.state.selected){
+      if(this.state.selected === AppConstants.ALL || match.category === this.state.selected){
         return true;
       }
       return false;
