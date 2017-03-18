@@ -71,7 +71,7 @@ class App extends React.Component{
       }
       return (
         <div>
-          {printCategory && (<div className='col-lg-12 col-md-12 col-sm-12 text-center category'>{currentCategory}</div>)}
+          {(printCategory && this.state.category !== AppConstants.ALL) && (<div className='col-lg-12 col-md-12 col-sm-12 text-center category'>{currentCategory}</div>)}
           <div className = 'col-xl-4 col-lg-4 col-md-6 col-sm-6 col-xm-12' key = {index}>
             <div className = {'scorecard '+(notStarted?'not-started':'')}>
               <ScoreCard data={match} />
