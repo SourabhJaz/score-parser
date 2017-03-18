@@ -41,9 +41,9 @@ class App extends React.Component{
         notStarted = true;
       }
       return (
-          <div className = 'col-xl-4 col-lg-4 col-md-6 col-sm-12' key = {index}>
+          <div className = 'col-xl-4 col-lg-4 col-md-6 col-sm-6 col-xm-12' key = {index}>
             <div className = {'scorecard '+(notStarted?'not-started':'')}>
-              <ScoreCard team_1={match.team_1} team_2={match.team_2} score_1={match.score_1} score_2={match.score_2} status={match.status} />
+              <ScoreCard data={match} />
             </div>
           </div>
       )
