@@ -21247,8 +21247,13 @@ var App = function (_React$Component) {
       var currentMatches = this.state.data || {};
       var matchList = currentMatches.matches || [];
       var scoreCards = [];
-      var notStarted, printCategory;
+      var notStarted,
+          printCategory,
+          allSelected = false;
       var currentCategory = '';
+      if (this.state.selected === _AppConstants2.default.ALL) {
+        allSelected = true;
+      }
       scoreCards = matchList.filter(this._filterMatch.bind(this)).map(function (match, index) {
         notStarted = false;
         printCategory = false;
@@ -21262,7 +21267,7 @@ var App = function (_React$Component) {
         return _react2.default.createElement(
           'div',
           null,
-          printCategory && _react2.default.createElement(
+          printCategory && !allSelected && _react2.default.createElement(
             'div',
             { className: 'col-lg-12 col-md-12 col-sm-12 text-center category' },
             currentCategory
@@ -21355,7 +21360,7 @@ var Dropdown = function (_React$Component) {
 			var options = this._processList();
 			return _react2.default.createElement(
 				'div',
-				null,
+				{ className: 'col-lg-12 col-md-12 col-sm-12' },
 				_react2.default.createElement(
 					'select',
 					{ className: 'col-lg-3 col-md-6 col-sm-12 text-center dropdown',

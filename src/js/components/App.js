@@ -56,8 +56,11 @@ class App extends React.Component{
     var currentMatches = this.state.data || {};
     var matchList = currentMatches.matches || [];
     var scoreCards = [];
-    var notStarted, printCategory;
+    var notStarted, printCategory, allSelected = false;
     var currentCategory = '';
+    if(this.state.selected === AppConstants.ALL){
+      allSelected = true;
+    }
     scoreCards = matchList.filter(this._filterMatch.bind(this)).map(function(match,index){
       notStarted = false;
       printCategory = false;
@@ -71,7 +74,7 @@ class App extends React.Component{
       }
       return (
         <div>
-          {(printCategory && this.state.category !== AppConstants.ALL) && (<div className='col-lg-12 col-md-12 col-sm-12 text-center category'>{currentCategory}</div>)}
+          {(printCategory &&  !allSelected) && (<div className='col-lg-12 col-md-12 col-sm-12 text-center category'>{currentCategory}</div>)}
           <div className = 'col-xl-4 col-lg-4 col-md-6 col-sm-6 col-xm-12' key = {index}>
             <div className = {'scorecard '+(notStarted?'not-started':'')}>
               <ScoreCard data={match} />

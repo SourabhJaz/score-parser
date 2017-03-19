@@ -38,15 +38,15 @@ body{
 .scores{
         color: #FFFFFF;
         text-transform: uppercase;
-        min-height: 100px;
+        min-height: 75px;
 }
 .team-name{
         font-size: 20px;
 }
 .team-score{
-        font-size: 20px;
+        font-size: 18px;
         color: #C0C0C0;
-        line-height: 25px;
+        line-height: 30px;
 }
 .status{
         color: #FFFFFF;
