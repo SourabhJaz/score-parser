@@ -30,7 +30,7 @@ body{
         word-wrap: break-word;
         margin-top: 5%;
         margin-bottom: 5%;
-        height: 220px;
+        height: 230px;
 }
 .not-started{
         border: 5px solid #687180;    
@@ -38,15 +38,15 @@ body{
 .scores{
         color: #FFFFFF;
         text-transform: uppercase;
-        min-height: 75px;
+        min-height: 100px;
 }
 .team-name{
         font-size: 20px;
 }
 .team-score{
-        font-size: 18px;
+        font-size: 20px;
         color: #C0C0C0;
-        line-height: 30px;
+        line-height: 25px;
 }
 .status{
         color: #FFFFFF;
