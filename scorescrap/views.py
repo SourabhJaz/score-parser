@@ -9,41 +9,57 @@ from couchdb import Server
 def index(request):
 	return HttpResponse("Welcome!")
 
-def removeEmptyKeys(match_data):
-	match_data_keys = match_data.keys()
+def removeEmptyKeys(match_report):
+	match_data_keys = match_report.keys()
 	for key in match_data_keys:
-		if not match_data[key]:
-			del match_data[key]
-	return match_data
+		if not match_report[key]:
+			del match_report[key]
+	return match_report
 
-def storeDataInCouchdb(match_data):
+def storeDataInCouchdb(match_report):
+	# Type for couchDB views
+	match_report['type'] = 'scorecard'
+	match_data_cleaned = removeEmptyKeys(match_report)
+
+	# CouchDB operations
 	couchdb_server = Server('http://127.0.0.1:5984')
-	match_db = couchdb_server['cricket_scores']
-	match_data_cleaned = removeEmptyKeys(match_data)
+	try:
+		match_db = couchdb_server['cricket_scores_db']		
+	except:
+		match_db = couchdb_server.create('cricket_scores_db')	
 	match_db.save(match_data_cleaned)
+
+def getTeamDetailsFromBlock(team):
+	team_name = ''
+	team_score = ''
+	team_score_span = team.find('span',{'class':'bold'})
+	if team_score_span != None:
+		team_score = getUnicodeString(team_score_span.text)
+		team_name_string = team_score_span.previous_sibling
+		if team_name_string != None:
+			team_name = getUnicodeString(team_name_string)
+	return team_name, team_score
 
 def getUnicodeString(text):
 	return unicode(text.strip())
 
 def getMatchDetails(match):
 		match_report = {}
+
 		location = match.find('span',{'class':'match-no'})
 		if location != None:
 			match_report["location"] = getUnicodeString(location.text)
+
 		team1 = match.find('div',{'class':'innings-info-1'})
-		team1_score = team1.find('span',{'class':'bold'})
-		if team1_score != None:
-			match_report["score_1"] = getUnicodeString(team1_score.text)
-			team1_name = team1_score.previous_sibling
-			if team1_name != None:
-				match_report["team_1"] = getUnicodeString(team1_name)
+		team1_name, team1_score = getTeamDetailsFromBlock(team1)
+		match_report["team_1"] = team1_name
+		match_report["score_1"] = team1_score
+
 		team2 = match.find('div',{'class':'innings-info-2'})
-		team2_score = team2.find('span',{'class':'bold'})
-		if team2_score != None:
-			match_report["score_2"] = getUnicodeString(team2_score.text)
-			team2_name = team2_score.previous_sibling
-			if team1_name != None:
-				match_report["team_2"] = getUnicodeString(team2_name)
+		team2_name, team2_score = getTeamDetailsFromBlock(team2)
+		match_report["team_2"] = team2_name
+		match_report["score_2"] = team2_score
+
 		match_status = match.find('div',{'class':'match-status'})
 		if match_status != None:
 			match_report["status"] = getUnicodeString(match_status.text)
