@@ -9,6 +9,19 @@ from couchdb import Server
 def index(request):
 	return HttpResponse("Welcome!")
 
+def search_by_team(request, team_name):
+	couchdb_server = Server('http://127.0.0.1:5984')
+	try:
+		match_db = couchdb_server['cricket_scores_db']	
+		search_result = []
+		for entry in match_db.view('score_doc/by_team', key=team_name):
+			match_report = {}
+			match_report = entry.value
+			search_result.append(match_report)
+		return JsonResponse({'result': search_result})
+	except:
+		return HttpResponse(status = 404)		
+
 def removeEmptyKeys(match_report):
 	match_data_keys = match_report.keys()
 	for key in match_data_keys:
@@ -78,11 +91,12 @@ def getAllMatchBlocks(parsed_page):
 def get_scores(request):
 	response = urlopen("http://www.espncricinfo.com/ci/engine/match/index.html?view=live")
 	parsed_page = BeautifulSoup(response,"html.parser")
-	all_matches = getAllMatchBlocks(parsed_page)
-
-	for match_block in all_matches:
+	all_matches_block = getAllMatchBlocks(parsed_page)
+	all_matches_report = []
+	for match_block in all_matches_block:
 		match_report = {}
 		match_report = getMatchDetails(match_block)
-		storeDataInCouchdb(match_report)
+		all_matches_report.append(match_report)
+		storeDataInCouchdb(dict(match_report))
 
-	return 	HttpResponse(status = 200)
+	return JsonResponse({'matches': all_matches_report})
